@@ -1,0 +1,136 @@
+{
+  "data": {
+    "ctRegions": [
+      {
+        "code": "CAT011",
+        "name": "서울",
+        "displayName": "서울",
+        "children": [
+          {
+            "code": "CAT011",
+            "name": "서울",
+            "displayName": "서울 전체",
+            "selectSamePrefix": true,
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011001",
+            "name": "강남",
+            "displayName": "강남",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011002",
+            "name": "서초",
+            "displayName": "서초",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011003",
+            "name": "잠실/송파/강동",
+            "displayName": "잠실/송파/강동",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011004",
+            "name": "영등포/여의도/강서",
+            "displayName": "영등포/여의도/강서",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011005",
+            "name": "건대/성수/왕십리",
+            "displayName": "건대/성수/왕십리",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011006",
+            "name": "종로/중구",
+            "displayName": "종로/중구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011007",
+            "name": "홍대/합정/마포",
+            "displayName": "홍대/합정/마포",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011008",
+            "name": "용산/이태원/한남",
+            "displayName": "용산/이태원/한남",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011009",
+            "name": "성북/노원/중랑",
+            "displayName": "성북/노원/중랑",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT011010",
+            "name": "구로/관악/동작",
+            "displayName": "구로/관악/동작",
+            "relativeNodes": []
+          }
+        ]
+      },
+      {
+        "code": "CAT026",
+        "name": "부산",
+        "displayName": "부산",
+        "children": [
+          {
+            "code": "CAT026",
+            "name": "부산",
+            "displayName": "부산 전체",
+            "selectSamePrefix": true,
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026001",
+            "name": "해운대구/기장",
+            "displayName": "해운대구/기장",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026002",
+            "name": "수영구/남구",
+            "displayName": "수영구/남구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026003",
+            "name": "부산진구(서면)/동구",
+            "displayName": "부산진구(서면)/동구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026004",
+            "name": "중구/서구/영도구",
+            "displayName": "중구/서구/영도구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026005",
+            "name": "연제구/동래구/금정구",
+            "displayName": "연제구/동래구/금정구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026006",
+            "name": "북구/사상구",
+            "displayName": "북구/사상구",
+            "relativeNodes": []
+          },
+          {
+            "code": "CAT026007",
+            "name": "강서구/사하구",
+            "displayName": "강서구/사하구",
+            "relativeNodes": []
+          }
+        ]
+      }
+    ]
+  }
+}

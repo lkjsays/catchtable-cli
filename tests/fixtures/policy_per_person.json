@@ -1,0 +1,98 @@
+{
+  "data": {
+    "hasEmptySlot": true,
+    "tableSelectionType": "STEP",
+    "refundPolicies": [
+      {
+        "isSpecialPolicy": false,
+        "baseDay": -1,
+        "refundRate": 0.0
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 0,
+        "refundRate": 0.0
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 1,
+        "refundRate": 0.2
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 2,
+        "refundRate": 0.5
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 3,
+        "refundRate": 1.0
+      }
+    ],
+    "reservationPenaltyAvailable": true,
+    "chargeAmounts": [
+      {
+        "baseDay": -1,
+        "chargeRate": 1.0,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 0,
+        "chargeRate": 1.0,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 1,
+        "chargeRate": 0.8,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 2,
+        "chargeRate": 0.5,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 3,
+        "chargeRate": 0.0,
+        "chargeAmount": null
+      }
+    ],
+    "changePreview": null,
+    "tables": [
+      {
+        "tableType": "H",
+        "tableName": "홀",
+        "reservable": true,
+        "menuSets": [
+          {
+            "menuType": "DEPOSIT_PER_MAN",
+            "menuSetSeq": 71627,
+            "name": "인당 1만원",
+            "guideMessage": "",
+            "amountPerPerson": 10000,
+            "maxAmount": 200000000
+          }
+        ],
+        "addons": [],
+        "benefit": null
+      },
+      {
+        "tableType": "B",
+        "tableName": "바",
+        "reservable": true,
+        "menuSets": [
+          {
+            "menuType": "DEPOSIT_PER_MAN",
+            "menuSetSeq": 71627,
+            "name": "인당 1만원",
+            "guideMessage": "",
+            "amountPerPerson": 10000,
+            "maxAmount": 200000000
+          }
+        ],
+        "addons": [],
+        "benefit": null
+      }
+    ]
+  }
+}

@@ -4,15 +4,18 @@ Agent DX 원칙 적용:
 - 3. Runtime Schema Introspection: schema 서브커맨드
 - 1. JSON-First Output: 종료 코드 체계화
 """
+
 from __future__ import annotations
 
 import json
-import sys
 
 import typer
 from rich.console import Console
 
 from catchtable_cli import __version__
+from catchtable_cli.commands.account import auth_app, doctor, reservations_app
+from catchtable_cli.commands.recommend import recommend
+from catchtable_cli.commands.reserve import reserve
 from catchtable_cli.commands.search import search_app
 from catchtable_cli.commands.shop import shop_app
 
@@ -27,6 +30,11 @@ app = typer.Typer(
 
 app.add_typer(search_app, name="search")
 app.add_typer(shop_app, name="shop")
+app.add_typer(auth_app, name="auth")
+app.add_typer(reservations_app, name="reservations")
+app.command("recommend")(recommend)
+app.command("reserve")(reserve)
+app.command("doctor")(doctor)
 
 # schema 서브앱 (원칙 3: Runtime Schema Introspection)
 schema_app = typer.Typer(help="커맨드 스키마 자체검사")
@@ -46,8 +54,10 @@ def schema_show(
     schema = get_command_schema(command)
     if schema is None:
         err_console.print(f"[red]알 수 없는 커맨드: {command!r}[/red]")
-        err_console.print("[yellow]사용 가능한 커맨드 목록은 'ct schema list'를 실행하세요.[/yellow]")
-        raise typer.Exit(code=1)
+        err_console.print(
+            "[yellow]사용 가능한 커맨드 목록은 'ct schema list'를 실행하세요.[/yellow]"
+        )
+        raise typer.Exit(code=2)
 
     print(json.dumps(schema, ensure_ascii=False, indent=2))
 
@@ -60,13 +70,6 @@ def schema_list() -> None:
     commands = list_commands()
     output = {"commands": commands}
     print(json.dumps(output, ensure_ascii=False, indent=2))
-
-
-@app.command()
-def reserve() -> None:
-    """예약을 생성합니다. (미구현)"""
-    err_console.print("[red]reserve 커맨드는 아직 구현되지 않았습니다.[/red]")
-    raise typer.Exit(1)
 
 
 @app.command()
@@ -92,7 +95,11 @@ def overview() -> None:
         "  search   매장 검색\n"
         "  shop     매장 정보 조회\n"
         "  schema   커맨드 스키마 조회\n"
-        "  reserve  예약 생성\n"
-        "  notify   빈자리 알림\n"
+        "  recommend  조건에 맞는 식당 추천\n"
+        "  reserve  최신 시간 확인 후 공식 예약 화면 연결\n"
+        "  reservations  내 예약 확인\n"
+        "  auth     세션 설정/확인\n"
+        "  doctor   연결 진단\n"
+        "  notify   빈자리 알림 (미구현)\n"
         "  version  버전 출력"
     )

@@ -1,0 +1,66 @@
+{
+  "menuBoards": [
+    {
+      "thumbUrl": "https://ugc-images.catchtable.co.kr/shop/manager/images/2204616a42b24e74b3b89abbe25afb1c",
+      "imageUrl": "https://ugc-images.catchtable.co.kr/shop/manager/images/2204616a42b24e74b3b89abbe25afb1c",
+      "width": 2953,
+      "height": 2953,
+      "type": "MENU",
+      "regDate": "2024-11-29"
+    }
+  ],
+  "menus": [
+    {
+      "type": "category",
+      "foodMenuSeq": 866319,
+      "name": "야키토리",
+      "minPrice": "2800",
+      "maxPrice": "24000",
+      "description": "",
+      "items": [
+        {
+          "type": "menu",
+          "foodMenuSeq": 991637,
+          "name": "오마카세 1인",
+          "minPrice": "24000",
+          "maxPrice": "",
+          "description": "육류4종&야채1종&샐러드",
+          "isRecommended": false,
+          "isNew": false,
+          "isRepresentative": true,
+          "isShowingMenuImage": true,
+          "imageUrl": "https://ugc-images.catchtable.co.kr/shop/manager/images/45122d67a8c043b685494bbc76ecda65",
+          "width": 4032,
+          "height": 3024
+        },
+        {
+          "type": "menu",
+          "foodMenuSeq": 991638,
+          "name": "사시미 (닭안심)",
+          "minPrice": "4300",
+          "maxPrice": "",
+          "description": "",
+          "isRecommended": false,
+          "isNew": false,
+          "isRepresentative": false,
+          "isShowingMenuImage": false,
+          "imageUrl": "https://ugc-images.catchtable.co.kr/shop/manager/images/72b34c7855c74ee0b5b7becc5b2fd569",
+          "width": 4032,
+          "height": 3024
+        }
+      ]
+    }
+  ],
+  "menuDetailInfo": {
+    "isKidsMenu": null,
+    "kidsMenuGuide": "",
+    "isAllergyMenuSubstitute": null,
+    "allergyMenuSubstituteGuide": "",
+    "isVeganMenuSubstitute": null,
+    "veganMenuSubstituteGuide": "",
+    "isAlcoholOrderRequired": true,
+    "corkChargeGuide": "",
+    "lastMenuUpdateDateTime": "2025-08-06"
+  },
+  "popularMenus": []
+}

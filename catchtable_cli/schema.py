@@ -1,99 +1,270 @@
-"""런타임 스키마 자체검사 모듈 (Agent DX 원칙 3: Runtime Schema Introspection)."""
+"""Schemas derived from the actual Click/Typer command definitions."""
+
 from __future__ import annotations
 
 from typing import Any
 
+from typer.main import get_command
+
 from catchtable_cli.models import (
-    AutocompleteData,
     AutocompleteSuggestion,
     DaySlot,
-    DaySlotsData,
-    SearchListData,
     SearchShop,
     ShopDetail,
-    ValidUrlData,
 )
+from catchtable_cli.requests import SORT_TYPES
 
-# 커맨드별 스키마 메타데이터 정의
-_COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
-    "search search": {
-        "description": "자동완성 API로 검색 키워드 제안을 조회합니다.",
-        "parameters": {
-            "keyword": {"type": "string", "required": True, "description": "자동완성 키워드"},
-            "--limit": {"type": "integer", "default": 20, "min": 1, "max": 100, "description": "최대 표시 건수"},
-            "--format": {"type": "string", "default": "json", "enum": ["json", "table", "compact"], "description": "출력 형식"},
-            "--fields": {"type": "string", "default": None, "description": "응답 필드 선택 (쉼표 구분)"},
-            "--json-body": {"type": "string", "default": None, "description": "요청 본문 JSON 직접 전달"},
-            "--params": {"type": "string", "default": None, "description": "API 쿼리 파라미터 오버라이드 (key=value 쉼표 구분)"},
-            "--dry-run": {"type": "boolean", "default": False, "description": "API 미호출, 요청 계획만 출력"},
-            "--suggest": {"type": "boolean", "default": False, "description": "결과 없을 시 유사 키워드 자동 제안 (Smart Search)"},
-        },
-        "response_model": AutocompleteData.model_json_schema(),
-        "exit_codes": {
-            "0": "성공",
-            "1": "API 오류 또는 요청 실패",
-            "2": "인증 오류",
-        },
+EXIT_CODES = {
+    "0": "성공",
+    "1": "API/네트워크/응답 형식 오류",
+    "2": "입력 오류",
+    "3": "인증/권한 오류",
+    "4": "부분 실패 (매장 상세 성공, 예약 날짜 조회 실패)",
+    "5": "요청한 예약 시간 확인 불가",
+}
+EXTRA_OUTPUTS = {
+    "shop menu": {
+        "ok": "boolean",
+        "alias": "string",
+        "observed_at": "string",
+        "source": "string",
+        "items": "array",
+        "notices": "array",
+        "menu_boards": "array",
+        "last_updated_at": ["string", "null"],
+        "alcohol_order_required": ["boolean", "null"],
+        "corkage_guide": ["string", "null"],
+        "price_status": "string",
+        "currency": "string",
+        "note": "string",
     },
-    "search region": {
-        "description": "지역 기반 매장 검색을 수행합니다.",
-        "parameters": {
-            "--region": {"type": "string", "required": True, "description": "지역명 (예: 판교, 강남)"},
-            "--category": {"type": "string", "default": None, "description": "카테고리"},
-            "--visit-date": {"type": "string", "default": None, "description": "방문일 (YYYY-MM-DD)"},
-            "--person-count": {"type": "integer", "default": 2, "description": "인원수"},
-            "--sort": {"type": "string", "default": "RATING", "enum": ["RATING", "REVIEW", "DISTANCE"], "description": "정렬"},
-            "--food-kind": {"type": "string", "default": None, "description": "음식 종류 코드"},
-            "--page": {"type": "integer", "default": 1, "min": 1, "description": "페이지 번호"},
-            "--page-size": {"type": "integer", "default": 15, "min": 1, "max": 100, "description": "페이지당 결과 수"},
-            "--format": {"type": "string", "default": "json", "enum": ["json", "table", "compact"], "description": "출력 형식"},
-            "--fields": {"type": "string", "default": None, "description": "응답 필드 선택 (쉼표 구분)"},
-            "--json-body": {"type": "string", "default": None, "description": "요청 본문 JSON 직접 전달"},
-            "--params": {"type": "string", "default": None, "description": "API 쿼리 파라미터 오버라이드 (key=value 쉼표 구분)"},
-            "--dry-run": {"type": "boolean", "default": False, "description": "API 미호출, 요청 계획만 출력"},
-            "--suggest": {"type": "boolean", "default": False, "description": "결과 없을 시 유사 키워드 자동 제안 (Smart Search)"},
-        },
-        "response_model": SearchListData.model_json_schema(),
-        "shop_model": SearchShop.model_json_schema(),
-        "exit_codes": {
-            "0": "성공",
-            "1": "API 오류 또는 요청 실패",
-            "2": "인증 오류",
-        },
+    "shop policy": {
+        "ok": "boolean",
+        "alias": "string",
+        "shop_ref": "string",
+        "shop_name": ["string", "null"],
+        "date": "string",
+        "time": "string",
+        "person_count": "integer",
+        "observed_at": "string",
+        "source": "object",
+        "has_empty_slot": "boolean",
+        "table_selection_type": ["string", "null"],
+        "deposit_status": "string",
+        "deposit_required": ["boolean", "null"],
+        "deposit_total": ["integer", "null"],
+        "base_deposit_status": "string",
+        "base_deposit_total": ["integer", "null"],
+        "zero_deposit_option": "object",
+        "currency": "string",
+        "table_options": "array",
+        "refund_policies": "array",
+        "reservation_penalty_available": ["boolean", "null"],
+        "cancellation_charges": "array",
+        "scope": "string",
+        "reservation_created": "boolean",
     },
-    "shop info": {
-        "description": "alias를 shopRef로 변환한 뒤 매장 상세/예약 가능 날짜를 조회합니다.",
-        "parameters": {
-            "alias": {"type": "string", "required": True, "description": "매장 alias (예: bornandbredoriginal)"},
-            "--format": {"type": "string", "default": "json", "enum": ["json", "table", "compact"], "description": "출력 형식"},
-            "--fields": {"type": "string", "default": None, "description": "응답 필드 선택 (쉼표 구분)"},
-            "--json-body": {"type": "string", "default": None, "description": "요청 본문 JSON 직접 전달"},
-            "--params": {"type": "string", "default": None, "description": "API 쿼리 파라미터 오버라이드 (key=value 쉼표 구분)"},
-            "--dry-run": {"type": "boolean", "default": False, "description": "API 미호출, 요청 계획만 출력"},
-        },
-        "response_model": ShopDetail.model_json_schema(),
-        "day_slot_model": DaySlot.model_json_schema(),
-        "exit_codes": {
-            "0": "성공",
-            "1": "API 오류 또는 요청 실패",
-            "2": "인증 오류",
-        },
+    "shop availability": {
+        "ok": "boolean",
+        "shop_ref": "string",
+        "alias": "string",
+        "shop_name": "string",
+        "service_date": "string",
+        "person_count": "integer",
+        "observed_at": "string",
+        "availability_status": "string",
+        "slots": "array",
+        "metadata": "object",
+        "booking_url": "string",
     },
+    "recommend": {
+        "ok": "boolean",
+        "observed_at": "string",
+        "region_code": "string",
+        "date": ["string", "null"],
+        "person_count": ["integer", "null"],
+        "candidate_count": "integer",
+        "total_matches": ["integer", "null"],
+        "items": "array",
+        "ranking": "object",
+        "scope": "string",
+        "next_step": "string",
+    },
+    "reserve": {
+        "ok": "boolean",
+        "status": "string",
+        "reservation_created": "boolean",
+        "shop_name": "string",
+        "shop_ref": "string",
+        "service_date": "string",
+        "service_time": "string",
+        "person_count": "integer",
+        "observed_at": "string",
+        "slots": "array",
+        "booking_url": ["string", "null"],
+        "next_action": "string",
+        "completion_evidence": "string",
+    },
+    "reservations list": {"ok": "boolean", "data": "object", "scope": "string"},
+    "auth status": {
+        "ok": "boolean",
+        "credential_configured": "boolean",
+        "authenticated": ["boolean", "null"],
+        "login_url": "string",
+        "hint": "string",
+    },
+    "auth login": {"ok": "boolean", "authenticated": "boolean", "stored_in": "string"},
+    "auth logout": {
+        "ok": "boolean",
+        "stored_credential_removed": "boolean",
+        "note": "string",
+    },
+    "doctor": {
+        "ok": "boolean",
+        "tls_verification": "string",
+        "trust_store": "string",
+        "public_api": "string",
+        "active_transport": "string",
+        "credential_configured": "boolean",
+        "booking_mode": "string",
+        "agent_skill": "string",
+    },
+}
+MODELS = {
+    "search search": AutocompleteSuggestion,
+    "search region": SearchShop,
+    "search keyword": SearchShop,
+    "shop info": ShopDetail,
 }
 
 
-def get_command_schema(command: str) -> dict[str, Any] | None:
-    """커맨드 이름으로 스키마를 조회합니다.
-
-    Args:
-        command: 커맨드 경로 (예: "search region", "shop info")
-
-    Returns:
-        스키마 딕셔너리 또는 None
-    """
-    return _COMMAND_SCHEMAS.get(command)
-
-
 def list_commands() -> list[str]:
-    """사용 가능한 커맨드 목록을 반환합니다."""
-    return sorted(_COMMAND_SCHEMAS.keys())
+    return sorted(set(MODELS) | set(EXTRA_OUTPUTS))
+
+
+def get_command_schema(command: str) -> dict[str, Any] | None:
+    if command not in list_commands():
+        return None
+    from catchtable_cli.cli import app
+
+    cmd = get_command(app)
+    for part in command.split():
+        cmd = cmd.commands[part]
+    parameters = {}
+    for param in cmd.params:
+        key = param.opts[0]
+        # New Typer vendors its parameter types; avoid a transitive Click import.
+        type_name = param.type.name.lower()
+        kind = (
+            "boolean"
+            if type_name in {"bool", "boolean"}
+            else "integer"
+            if type_name.startswith("int")
+            else "number"
+            if type_name.startswith("float")
+            else "string"
+        )
+        spec = {
+            "type": kind,
+            "required": param.required,
+            "default": param.default,
+            "description": getattr(param, "help", None),
+        }
+        if hasattr(param.type, "choices"):
+            spec["enum"] = list(param.type.choices)
+        if hasattr(param.type, "min") and hasattr(param.type, "max"):
+            spec.update({"min": param.type.min, "max": param.type.max})
+        if key == "--sort":
+            spec["enum"] = list(SORT_TYPES)
+        parameters[key] = spec
+    if command in EXTRA_OUTPUTS:
+        props = {key: {"type": kind} for key, kind in EXTRA_OUTPUTS[command].items()}
+        for value in props.values():
+            if value["type"] == "array":
+                value["items"] = {"type": "object"}
+        if command == "shop policy":
+            props["deposit_status"] = {
+                "enum": [
+                    "none",
+                    "required",
+                    "conditional",
+                    "selection_required",
+                    "unknown",
+                    "unavailable",
+                ]
+            }
+        if command == "shop menu":
+            props["price_status"] = {"enum": ["listed", "unknown"]}
+        if command == "recommend":
+            props["items"]["items"] = SearchShop.model_json_schema(by_alias=False)
+            props["items"]["items"]["properties"].update(
+                {
+                    "score": {"type": "number"},
+                    "available_times": {"type": "array", "items": {"type": "string"}},
+                    "availability_verified": {"type": "boolean"},
+                    "reasons": {"type": "array", "items": {"type": "string"}},
+                    "booking_url": {"type": "string"},
+                }
+            )
+        if "slots" in props:
+            props["slots"]["items"] = {
+                "type": "object",
+                "properties": {
+                    "date": {"type": "string"},
+                    "time": {"type": "string"},
+                    "service_time": {"type": "string"},
+                    "available": {"type": ["boolean", "null"]},
+                    "person_count": {"type": "integer"},
+                    "table_type": {"type": ["string", "null"]},
+                    "confirmation_required": {"type": ["boolean", "null"]},
+                    "menu_set_seq": {"type": ["integer", "null"]},
+                },
+            }
+        return {
+            "description": cmd.help,
+            "parameters": parameters,
+            "response_model": {"type": "object", "properties": props},
+            "exit_codes": EXIT_CODES,
+        }
+    model = MODELS[command]
+    row_schema = model.model_json_schema(by_alias=False)
+    properties: dict[str, Any] = {"ok": {"type": "boolean"}}
+    if command == "shop info":
+        properties.update(
+            {
+                "partial": {"type": "boolean"},
+                "alias": {"type": "string"},
+                "shop_ref": {"type": "string"},
+                "shop": row_schema,
+                "day_slots_status": {"enum": ["ok", "empty", "error"]},
+                "day_slots": {
+                    "type": "array",
+                    "items": DaySlot.model_json_schema(by_alias=False),
+                },
+                "errors": {"type": "array", "items": {"type": "object"}},
+            }
+        )
+    else:
+        properties.update(
+            {
+                "items": {"type": "array", "items": row_schema},
+                "total": {"type": ["integer", "null"]},
+                "returned": {"type": "integer"},
+            }
+        )
+        if command in {"search region", "search keyword"}:
+            properties.update(
+                {
+                    "region_code": {"type": ["string", "null"]},
+                    "next_cursor": {"type": ["string", "null"]},
+                }
+            )
+        else:
+            properties["suggestions"] = {"type": "array", "items": {"type": "string"}}
+    return {
+        "description": cmd.help,
+        "parameters": parameters,
+        "response_model": {"type": "object", "properties": properties},
+        "field_model": row_schema,
+        "exit_codes": EXIT_CODES,
+    }

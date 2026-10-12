@@ -1,0 +1,192 @@
+{
+  "data": {
+    "totalShopCount": 1825,
+    "shopResultSize": 3,
+    "paging": {
+      "hasMore": true,
+      "nextOffset": "3:1643:1562-3:408:244-3:20:19"
+    },
+    "shopResults": {
+      "shops": [
+        {
+          "shopMeta": {
+            "shopRef": "on0UOgc3MScRinWA92VyfQ",
+            "shopName": "스시하쿠샤",
+            "foodKind": "스시오마카세",
+            "landName": "삼성",
+            "stats": {
+              "totalCount": 1076,
+              "avgTotalScore": 5.0
+            }
+          },
+          "dining": {
+            "multipleDatesSlotInfo": null,
+            "singleDateSlotInfo": {
+              "date": "2026-10-17",
+              "availableType": "AVAILABLE",
+              "state": 200,
+              "personCount": 4,
+              "tablePersonMin": 1,
+              "tablePersonMax": 3,
+              "timeSlotList": []
+            }
+          }
+        },
+        {
+          "shopMeta": {
+            "shopRef": "9FS4fIylY6xu0iOxAAhVaA",
+            "shopName": "타쿠",
+            "foodKind": "일식",
+            "landName": "압구정",
+            "stats": {
+              "totalCount": 188,
+              "avgTotalScore": 5.0
+            }
+          },
+          "dining": {
+            "multipleDatesSlotInfo": null,
+            "singleDateSlotInfo": {
+              "date": "2026-10-17",
+              "availableType": "AVAILABLE",
+              "state": 200,
+              "personCount": 4,
+              "tablePersonMin": 1,
+              "tablePersonMax": 4,
+              "timeSlotList": []
+            }
+          }
+        },
+        {
+          "shopMeta": {
+            "shopRef": "ahknPViXvZ72eNRDs1IQ6Q",
+            "shopName": "시드니 서울 Sydney Seoul ",
+            "foodKind": "양식",
+            "landName": "청담",
+            "stats": {
+              "totalCount": 166,
+              "avgTotalScore": 5.0
+            }
+          },
+          "dining": {
+            "multipleDatesSlotInfo": null,
+            "singleDateSlotInfo": {
+              "date": "2026-10-17",
+              "availableType": "AVAILABLE",
+              "state": 200,
+              "personCount": 4,
+              "tablePersonMin": 1,
+              "tablePersonMax": 6,
+              "timeSlotList": [
+                {
+                  "time": "12:00",
+                  "benefitType": "",
+                  "benefitValue": "",
+                  "availableYn": true,
+                  "date": "261017",
+                  "personCount": 4,
+                  "tableType": "H",
+                  "periodGubun": "L",
+                  "onlineNoticeSeq": 57506,
+                  "menuSetSeq": 96179,
+                  "menuSetSeqCommaList": "96179",
+                  "isConfirmReservation": false,
+                  "resp2": "1144028259",
+                  "availablePersonCounts": [
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "time": "13:00",
+                  "benefitType": "",
+                  "benefitValue": "",
+                  "availableYn": true,
+                  "date": "261017",
+                  "personCount": 4,
+                  "tableType": "H",
+                  "periodGubun": "L",
+                  "onlineNoticeSeq": 57506,
+                  "menuSetSeq": 96179,
+                  "menuSetSeqCommaList": "96179",
+                  "isConfirmReservation": false,
+                  "resp2": "1144028259",
+                  "availablePersonCounts": [
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "time": "17:00",
+                  "benefitType": "",
+                  "benefitValue": "",
+                  "availableYn": true,
+                  "date": "261017",
+                  "personCount": 4,
+                  "tableType": "H",
+                  "periodGubun": "D",
+                  "onlineNoticeSeq": 57506,
+                  "menuSetSeq": 96179,
+                  "menuSetSeqCommaList": "96179",
+                  "isConfirmReservation": false,
+                  "resp2": "1144028259",
+                  "availablePersonCounts": [
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "time": "18:00",
+                  "benefitType": "",
+                  "benefitValue": "",
+                  "availableYn": true,
+                  "date": "261017",
+                  "personCount": 4,
+                  "tableType": "H",
+                  "periodGubun": "D",
+                  "onlineNoticeSeq": 57506,
+                  "menuSetSeq": 96179,
+                  "menuSetSeqCommaList": "96179",
+                  "isConfirmReservation": false,
+                  "resp2": "1144028259",
+                  "availablePersonCounts": [
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "time": "19:30",
+                  "benefitType": "",
+                  "benefitValue": "",
+                  "availableYn": true,
+                  "date": "261017",
+                  "personCount": 4,
+                  "tableType": "H",
+                  "periodGubun": "D",
+                  "onlineNoticeSeq": 57506,
+                  "menuSetSeq": 96179,
+                  "menuSetSeqCommaList": "96179",
+                  "isConfirmReservation": false,
+                  "resp2": "1144028259",
+                  "availablePersonCounts": [
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

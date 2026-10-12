@@ -1,0 +1,69 @@
+{
+  "data": {
+    "hasEmptySlot": true,
+    "tableSelectionType": "NO_SELECTION",
+    "refundPolicies": [
+      {
+        "isSpecialPolicy": false,
+        "baseDay": -1,
+        "refundRate": 0.0
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 0,
+        "refundRate": 0.2
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 1,
+        "refundRate": 0.5
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 2,
+        "refundRate": 1.0
+      }
+    ],
+    "reservationPenaltyAvailable": true,
+    "chargeAmounts": [
+      {
+        "baseDay": -1,
+        "chargeRate": 1.0,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 0,
+        "chargeRate": 0.8,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 1,
+        "chargeRate": 0.5,
+        "chargeAmount": null
+      },
+      {
+        "baseDay": 2,
+        "chargeRate": 0.0,
+        "chargeAmount": null
+      }
+    ],
+    "changePreview": null,
+    "defaultTable": {
+      "tableType": "B",
+      "tableName": "바",
+      "reservable": true,
+      "menuSets": [
+        {
+          "menuType": "DEPOSIT_PER_MAN",
+          "menuSetSeq": 88512,
+          "name": "팀당 1",
+          "guideMessage": "",
+          "amountPerPerson": 10000,
+          "maxAmount": 10000
+        }
+      ],
+      "addons": [],
+      "benefit": null
+    }
+  }
+}

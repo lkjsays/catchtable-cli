@@ -1,0 +1,34 @@
+{
+  "data": {
+    "hasEmptySlot": true,
+    "tableSelectionType": "NO_SELECTION",
+    "refundPolicies": [
+      {
+        "isSpecialPolicy": false,
+        "baseDay": -1,
+        "refundRate": 0.0
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 0,
+        "refundRate": 0.0
+      },
+      {
+        "isSpecialPolicy": false,
+        "baseDay": 1,
+        "refundRate": 1.0
+      }
+    ],
+    "reservationPenaltyAvailable": false,
+    "chargeAmounts": [],
+    "changePreview": null,
+    "defaultTable": {
+      "tableType": "H",
+      "tableName": "홀",
+      "reservable": true,
+      "menuSets": [],
+      "addons": [],
+      "benefit": null
+    }
+  }
+}

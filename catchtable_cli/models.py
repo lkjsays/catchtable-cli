@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 T = TypeVar("T")
 
@@ -33,6 +33,10 @@ class ApiEnvelope(CatchTableModel, Generic[T]):
 
 
 class AutocompleteSuggestion(CatchTableModel):
+    code: str | None = None
+    sub_label: str | None = Field(
+        default=None, validation_alias=AliasChoices("subLabel")
+    )
     item_type: str | None = Field(
         default=None,
         validation_alias=AliasChoices("itemType", "type"),
@@ -89,7 +93,9 @@ class ShopDetail(CatchTableModel):
     )
     food_kind_name: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("foodKindName", "foodKind", "categoryName", "category"),
+        validation_alias=AliasChoices(
+            "foodKindName", "foodKind", "categoryName", "category"
+        ),
     )
     shop_type_name: str | None = Field(
         default=None,
@@ -109,7 +115,9 @@ class ShopDetail(CatchTableModel):
     )
     phone_number: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("phoneNumber", "shopPhone", "dispShopPhone", "tel"),
+        validation_alias=AliasChoices(
+            "phoneNumber", "shopPhone", "dispShopPhone", "tel"
+        ),
     )
     avg_rating: float | None = Field(
         default=None,
@@ -125,7 +133,9 @@ class ShopDetail(CatchTableModel):
     )
     short_introduction: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("shortIntroduction", "serviceDesc", "description", "intro"),
+        validation_alias=AliasChoices(
+            "shortIntroduction", "serviceDesc", "description", "intro"
+        ),
     )
     lunch_price: str | None = Field(
         default=None,
@@ -152,7 +162,7 @@ class DaySlot(CatchTableModel):
     )
     status_code: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("statusCode", "status"),
+        validation_alias=AliasChoices("availableStatus", "statusCode", "status"),
     )
     is_available: bool | None = Field(
         default=None,
@@ -167,6 +177,22 @@ class DaySlot(CatchTableModel):
         validation_alias=AliasChoices("isHoliday", "holiday"),
     )
 
+    available_person_counts: list[int] = Field(
+        default_factory=list, validation_alias=AliasChoices("availablePersonCounts")
+    )
+
+    @model_validator(mode="after")
+    def derive_availability(self):
+        # Unknown/new statuses and PHONE_INQUIRY must remain indeterminate.
+        if self.is_available is None:
+            self.is_available = {
+                "AVAILABLE": True,
+                "DAY_OFF": False,
+                "CLOSED": False,
+                "BEFORE_OPEN": False,
+            }.get(self.status_code)
+        return self
+
 
 class DaySlotsData(CatchTableModel):
     day_slots: list[DaySlot] = Field(
@@ -176,6 +202,11 @@ class DaySlotsData(CatchTableModel):
 
 
 class SearchShop(CatchTableModel):
+    shop_url: str | None = Field(
+        default=None, validation_alias=AliasChoices("urlPathAlias", "shopUrl", "alias")
+    )
+    prices: dict[str, Any] | None = None
+    dining: dict[str, Any] | None = None
     shop_ref: str | None = Field(
         default=None,
         validation_alias=AliasChoices("shopRef", "id"),
@@ -210,11 +241,16 @@ class SearchShop(CatchTableModel):
         """shopResults.shops[] 항목에서 shopMeta를 풀어서 생성."""
         meta = shop_result.get("shopMeta", shop_result)
         stats = meta.get("stats", {}) or {}
-        return cls.model_validate({
-            **meta,
-            "reviewCount": stats.get("totalCount") or meta.get("reviewCount"),
-            "avgRating": stats.get("avgTotalScore") or meta.get("avgScore"),
-        })
+        return cls.model_validate(
+            {
+                **meta,
+                "reviewCount": stats.get("totalCount", meta.get("reviewCount")),
+                "avgRating": stats.get(
+                    "avgTotalScore", meta.get("avgScore", meta.get("avgRating"))
+                ),
+                "dining": shop_result.get("dining"),
+            }
+        )
 
 
 class SearchListData(CatchTableModel):

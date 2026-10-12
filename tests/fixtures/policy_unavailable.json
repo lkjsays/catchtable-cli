@@ -1,0 +1,11 @@
+{
+  "data": {
+    "hasEmptySlot": false,
+    "tableSelectionType": "NO_SELECTION",
+    "refundPolicies": [],
+    "reservationPenaltyAvailable": false,
+    "chargeAmounts": [],
+    "changePreview": null,
+    "defaultTable": null
+  }
+}

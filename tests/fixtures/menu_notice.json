@@ -1,0 +1,32 @@
+{
+  "menuBoards": [],
+  "menus": [
+    {
+      "type": "menu",
+      "foodMenuSeq": 1432737,
+      "name": "인스타그램 참조 (@tsukiya_shokudo)",
+      "minPrice": "1",
+      "maxPrice": "",
+      "description": "매장 인스타그램을 통하여 비정기적으로 변화하는 메뉴와 공지사항을 확인해 주시길 바랍니다.",
+      "isRecommended": true,
+      "isNew": true,
+      "isRepresentative": true,
+      "isShowingMenuImage": true,
+      "imageUrl": "https://ugc-images.catchtable.co.kr/shop/manager/images/4095f2191c0b42e2a3b76d36522a463a",
+      "width": 1290,
+      "height": 1290
+    }
+  ],
+  "menuDetailInfo": {
+    "isKidsMenu": false,
+    "kidsMenuGuide": "",
+    "isAllergyMenuSubstitute": null,
+    "allergyMenuSubstituteGuide": "",
+    "isVeganMenuSubstitute": false,
+    "veganMenuSubstituteGuide": "",
+    "isAlcoholOrderRequired": true,
+    "corkChargeGuide": "주종 상관 없이 테이블 당 최대 1병",
+    "lastMenuUpdateDateTime": "2026-02-22"
+  },
+  "popularMenus": []
+}

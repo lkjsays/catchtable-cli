@@ -1,0 +1,92 @@
+{
+  "data": [
+    {
+      "date": "2026-10-11",
+      "availableStatus": "DAY_OFF",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-12",
+      "availableStatus": "DAY_OFF",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-13",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-14",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-15",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-16",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-17",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-18",
+      "availableStatus": "DAY_OFF",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-19",
+      "availableStatus": "DAY_OFF",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-20",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-21",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-22",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-23",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    },
+    {
+      "date": "2026-10-24",
+      "availableStatus": "CLOSED",
+      "availablePersonCounts": [],
+      "benefit": null
+    }
+  ],
+  "resultCode": "OK",
+  "displayMessage": null,
+  "message": null,
+  "errors": null
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+
 try:
     from curl_cffi.requests import AsyncSession as CurlAsyncSession
     from curl_cffi.requests.exceptions import RequestException as CurlRequestException
@@ -11,6 +12,7 @@ except ImportError:  # pragma: no cover - optional dependency fallback
     CurlRequestException = None
 
 from catchtable_cli.config import CatchTableConfig
+from catchtable_cli.tls import ssl_context
 
 
 class CatchTableAPIError(RuntimeError):
@@ -37,11 +39,25 @@ class CatchTableClient:
 
     def __init__(self, config: CatchTableConfig | None = None) -> None:
         self.config = config or CatchTableConfig()
+        if (
+            not self.config.session_cookie
+            and self.config.use_keychain
+            and self.config.api_base_url.rstrip("/")
+            == "https://ct-api.catchtable.co.kr"
+        ):
+            import os
+
+            from catchtable_cli.credentials import read_cookie
+
+            # Even an explicitly empty environment value disables stored cookies.
+            if "CT_SESSION_COOKIE" not in os.environ:
+                self.config.session_cookie = read_cookie()
         self._httpx_client = httpx.AsyncClient(
             base_url=self.config.api_base_url,
             headers=self._build_headers(),
             cookies=self._build_cookies(),
             timeout=30.0,
+            verify=ssl_context(),
         )
         self._use_curl_cffi = bool(
             self.config.use_curl_cffi and CurlAsyncSession is not None
@@ -81,8 +97,19 @@ class CatchTableClient:
     @staticmethod
     def _raise_if_api_error(payload: Any) -> None:
         if not isinstance(payload, dict):
-            return
-        if payload.get("isSuccess") is False:
+            raise RuntimeError("API 응답은 JSON 객체여야 합니다.")
+        code = payload.get("resultCode")
+        if not isinstance(code, (str, int, type(None))):
+            raise RuntimeError("API resultCode 형식이 올바르지 않습니다.")
+        if payload.get("isSuccess") is False or code not in {
+            None,
+            "OK",
+            "SUCCESS",
+            0,
+            "0",
+            200,
+            "200",
+        }:
             result_code = payload.get("resultCode")
             message = (
                 payload.get("resultMessage")
@@ -146,7 +173,9 @@ class CatchTableClient:
         if self._curl_client is None:
             raise RuntimeError("curl_cffi AsyncSession is not initialized.")
 
-        resp = await self._curl_client.request(method, url, params=params, json=json_body)
+        resp = await self._curl_client.request(
+            method, url, params=params, json=json_body
+        )
         self._raise_http_status_for_curl(
             method=method,
             url=url,
@@ -197,13 +226,23 @@ class CatchTableClient:
             except httpx.HTTPStatusError:
                 raise
             except Exception as exc:
-                if self._should_fallback_to_httpx(exc):
+                safe_read = method.upper() == "GET" or url in {
+                    "/api/v5/autocomplete/_list",
+                    "/api/v7/search/list",
+                    "/api/reservation/v1/dining/time-slots",
+                }
+                if self._should_fallback_to_httpx(exc) and safe_read:
+                    self._use_curl_cffi = False
                     return await self._request_with_httpx(
                         method,
                         url,
                         params=params,
                         json_body=json_body,
                     )
+                if self._should_fallback_to_httpx(exc):
+                    raise httpx.RequestError(
+                        "전송 결과를 확인할 수 없습니다. 상태 확인 전 재전송하지 마세요."
+                    ) from exc
                 raise
 
         return await self._request_with_httpx(
@@ -213,116 +252,90 @@ class CatchTableClient:
             json_body=json_body,
         )
 
-    async def autocomplete(self, query: str) -> dict[str, Any]:
-        """POST /api/v5/autocomplete/_list — 자동완성 목록."""
-        return await self._request(
-            "POST",
-            "/api/v5/autocomplete/_list",
-            json_body={"query": query},
-        )
+    async def autocomplete(
+        self, query: str, *, json_body: dict | None = None, params: dict | None = None
+    ) -> dict[str, Any]:
+        from catchtable_cli.requests import autocomplete_request
+        from catchtable_cli.validate import require_text
+
+        body = dict(json_body) if json_body is not None else {"query": query}
+        body["query"] = require_text(body.get("query"), "query")
+        return await autocomplete_request(body, params).send(self)
 
     async def search(
         self,
-        keyword: str | None = None,
-        location: str | None = None,
-        category: str | None = None,
+        location: str,
+        *,
         date: str | None = None,
         party_size: int | None = None,
         food_kind_code: str | None = None,
-        sort_method: str | None = None,
-        page: int = 1,
-        size: int = 20,
+        sort_method: str = "RATING",
+        cursor: str = "0",
+        size: int = 15,
+        params: dict | None = None,
     ) -> dict[str, Any]:
-        """POST /api/v6/search/list — 매장 검색."""
-        offset = (page - 1) * size
-        body: dict[str, Any] = {"paging": {"page": page, "size": size, "offset": offset}}
-        if keyword:
-            body["keyword"] = keyword
-        if location:
-            body["region"] = location
-        if category:
-            body["category"] = category
-        if date:
-            body["visitDate"] = date
-        if party_size is not None:
-            body["personCount"] = party_size
-        if food_kind_code:
-            body["foodKindCode"] = food_kind_code
-        if sort_method:
-            body["sortMethod"] = sort_method
-        return await self._request(
-            "POST",
-            "/api/v6/search/list",
-            json_body=body,
+        from catchtable_cli.requests import (
+            region_request,
+            resolve_region,
+            search_body,
+            search_request,
         )
+        from catchtable_cli.validate import validate_search_body
+
+        body = search_body(
+            "<region>",
+            date=date,
+            person_count=party_size,
+            food_kind=food_kind_code,
+            sort=sort_method,
+            cursor=cursor,
+            size=size,
+        )
+        validate_search_body(body)
+        code = resolve_region(await region_request().send(self), location)
+        body["filters"]["displayRegionCodes"] = [code]
+        return await search_request(body, params).send(self)
 
     async def resolve_alias(self, alias: str) -> dict[str, Any]:
         """GET /api/v3/shop/valid-url — URL alias를 shopRef로 변환."""
         return await self._request(
-            "GET",
-            "/api/v3/shop/valid-url", params={"shopUrl": alias}
+            "GET", "/api/v3/shop/valid-url", params={"shopUrl": alias}
         )
 
     async def get_shop(self, shop_ref: str) -> dict[str, Any]:
-        """GET /api/v4/shops/{shopRef} — 매장 상세 (Chrome RE 확인)."""
-        return await self._request("GET", f"/api/v4/shops/{shop_ref}")
+        from catchtable_cli.requests import shop_request
+
+        return await shop_request(shop_ref).send(self)
 
     async def get_shop_detail_settings(self, shop_ref: str) -> dict[str, Any]:
         """GET /api/display/v2/shops/{shopRef}/detail-settings — 상세 설정."""
         return await self._request(
-            "GET",
-            f"/api/display/v2/shops/{shop_ref}/detail-settings"
+            "GET", f"/api/display/v2/shops/{shop_ref}/detail-settings"
         )
 
     async def get_shop_menu(self, shop_ref: str) -> dict[str, Any]:
         """GET /api/display/v2/shops/{shopRef}/tabs/menu — 메뉴 조회."""
-        return await self._request(
-            "GET",
-            f"/api/display/v2/shops/{shop_ref}/tabs/menu"
-        )
+        from catchtable_cli.requests import menu_request
 
-    async def get_day_slots(self, shop_ref: str) -> dict[str, Any]:
-        """GET /api/reservation/v1/dining/day-slots — 예약 가능 날짜 (Chrome RE 확인)."""
-        return await self._request(
-            "GET",
-            "/api/reservation/v1/dining/day-slots",
-            params={"shopRef": shop_ref, "tableSeqs": "", "personCounts": ""},
-        )
+        return await menu_request(shop_ref).send(self)
+
+    async def get_day_slots(
+        self, shop_ref: str, *, params: dict | None = None
+    ) -> dict[str, Any]:
+        from catchtable_cli.requests import slots_request
+
+        return await slots_request(shop_ref, params).send(self)
 
     async def check_availability(
-        self,
-        shop_ref: str,
-        date: str,
-        party_size: int,
+        self, shop_ref: str, date: str, party_size: int
     ) -> dict[str, Any]:
-        """POST /api/reservation/v1/dining/time-slots — 예약 가능 시간."""
-        return await self._request(
-            "POST",
-            "/api/reservation/v1/dining/time-slots",
-            json_body={
-                "shopRef": shop_ref,
-                "visitYymmdd": date.replace("-", ""),
-                "personCount": party_size,
-            },
-        )
+        from catchtable_cli.dining import availability
 
-    async def reserve(
-        self,
-        shop_id: str,
-        date: str,
-        time: str,
-        party_size: int,
-    ) -> dict[str, Any]:
-        """POST /api/reservation/v2/dinings/create — 예약 생성."""
-        return await self._request(
-            "POST",
-            "/api/reservation/v2/dinings/create",
-            json_body={
-                "shopRef": shop_id,
-                "visitYymmdd": date.replace("-", ""),
-                "visitHhmi": time.replace(":", ""),
-                "personCount": party_size,
-            },
+        return await availability(self, shop_ref, date, party_size)
+
+    async def reserve(self, *args, **kwargs) -> dict[str, Any]:
+        raise RuntimeError(
+            "직접 예약 생성은 지원하지 않습니다. ct reserve로 최신 시간 확인 후 공식 예약 화면을 사용하세요."
         )
 
     async def list_reservations(

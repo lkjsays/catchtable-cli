@@ -1,0 +1,46 @@
+{
+  "data": {
+    "suggestions": [
+      {
+        "itemType": "FOOD_KIND",
+        "code": "E_31",
+        "label": "스시,초밥",
+        "subLabel": null,
+        "matchingCount": 1343,
+        "baseGeoPoint": null
+      },
+      {
+        "itemType": "FOOD_KIND",
+        "code": "E_73",
+        "label": "스시오마카세",
+        "subLabel": null,
+        "matchingCount": 665,
+        "baseGeoPoint": null
+      },
+      {
+        "itemType": "USER_QUERY",
+        "code": null,
+        "label": "스시이안엔제주",
+        "subLabel": null,
+        "matchingCount": 0,
+        "baseGeoPoint": null
+      },
+      {
+        "itemType": "USER_QUERY",
+        "code": null,
+        "label": "스시오마카세 서울",
+        "subLabel": null,
+        "matchingCount": 0,
+        "baseGeoPoint": null
+      },
+      {
+        "itemType": "USER_QUERY",
+        "code": null,
+        "label": "스시사카바 연남",
+        "subLabel": null,
+        "matchingCount": 0,
+        "baseGeoPoint": null
+      }
+    ]
+  }
+}
